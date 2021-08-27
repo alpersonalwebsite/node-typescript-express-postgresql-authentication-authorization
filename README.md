@@ -2,13 +2,24 @@
 
 ## Overview
 
-This is an easy, basic and raw example of HOW to authenticate and authorize with jsonwebtoken.
+This is an easy, basic and raw example of **HOW to** implement an API with Node, TS, Express and PostgreSQL to **authenticate and authorize with jsonwebtoken**.
 
 ## Requirements
 
-- Node 12+
-- NPM
-- PostgreSQL
+* Node 12+
+* NPM
+* PostgreSQL
+* db-migrate package as a global dependency
+
+Note: Other libraries will be installed as part of the project with `npm install`
+
+## Prerequisites
+
+### Create .env file
+Create at the root level of the project a `.env` file following the structure of `.env-sample`
+
+### Update database.json
+Update the file `database.json` with the proper information.
 
 ## Install dependencies
 
@@ -23,6 +34,12 @@ npm install
 ```shell
 createdb test_db
 createdb test_db_test
+```
+
+### Run migrations
+
+```shell
+npm run migrate:up
 ```
 
 ## Running the server
@@ -44,7 +61,7 @@ npm start
 ## Run unit tests
 
 ```shell
-npm run test
+npm test
 ```
 
 ## Linting
