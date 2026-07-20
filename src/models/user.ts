@@ -12,7 +12,7 @@ export type UserWithCredentials = User & {
   password: string;
 };
 
-const { CRYPT_PASSWORD: pepper, SALT_ROUNDS: saltRounds } = process.env;
+const { BCRYPT_PASSWORD: pepper, SALT_ROUNDS: saltRounds } = process.env;
 
 export class UserStore {
   async index(): Promise<User[]> {
