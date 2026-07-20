@@ -1,4 +1,2 @@
-export const isTheUser = (idInToken: number, idInRequest: number): boolean => {
-  if (idInToken === idInRequest) return true;
-  else return false;
-};
+export const isTheUser = (idInToken: number, idInRequest: number): boolean =>
+  idInToken === idInRequest;
