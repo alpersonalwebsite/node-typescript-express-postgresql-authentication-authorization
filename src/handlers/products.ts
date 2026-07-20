@@ -9,14 +9,14 @@ const index = async (_req: Request, res: Response): Promise<void> => {
   try {
     const products = await store.index();
     res.json(products);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch {
+    res.status(500).json({ message: 'Something went wrong!' });
   }
 };
 
 const show = async (req: Request, res: Response): Promise<void> => {
-  const product = await store.show(req.params.id);
   try {
+    const product = await store.show(req.params.id);
     if (!product) {
       throw new HandlerError(404, `We don't have that product`);
     }

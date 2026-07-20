@@ -65,7 +65,11 @@ const addProduct = async (req: Request, res: Response): Promise<void> => {
     });
     res.json(addedProduct);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    if (err instanceof HandlerError) {
+      res.status(err.statusCode).json({ message: err.message });
+    } else {
+      res.status(500).json({ message: 'Something went wrong!' });
+    }
   }
 };
 

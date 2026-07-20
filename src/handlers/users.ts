@@ -13,12 +13,12 @@ import { TOKEN_SECRET } from '../utils/env';
 
 const store = new UserStore();
 
-const index = async (req: Request, res: Response): Promise<string | void> => {
+const index = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await store.index();
     res.json(users);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch {
+    res.status(500).json({ message: 'Something went wrong!' });
   }
 };
 
