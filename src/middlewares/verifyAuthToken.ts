@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user';
+import { TOKEN_SECRET } from '../utils/env';
 
 interface UserToken extends jwt.JwtPayload {
   user: User;
@@ -16,7 +17,7 @@ export const verifyAuthToken = (
     const token = authHeader.split(' ')[1];
     const decodedToken: UserToken = jwt.verify(
       token,
-      process.env.TOKEN_SECRET || ''
+      TOKEN_SECRET
     ) as UserToken;
     const { id } = decodedToken.user;
     res.locals.token = {

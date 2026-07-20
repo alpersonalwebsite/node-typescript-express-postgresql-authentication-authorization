@@ -5,6 +5,7 @@ import { UserWithCredentials, UserStore } from '../models/user';
 import { verifyAuthToken } from '../middlewares/verifyAuthToken';
 import { HandlerError } from './helpers/handleError';
 import { isTheUser } from '../utils/user';
+import { TOKEN_SECRET } from '../utils/env';
 
 // interface UserToken extends jwt.JwtPayload {
 //   user: User;
@@ -63,10 +64,9 @@ const create = async (req: Request, res: Response): Promise<void> => {
       throw new HandlerError(400, `password is required`);
     }
     const createUser = await store.create(user);
-    const token = jwt.sign(
-      { user: createUser },
-      process.env.TOKEN_SECRET || ''
-    );
+    const token = jwt.sign({ user: { id: createUser.id } }, TOKEN_SECRET, {
+      expiresIn: '2h'
+    });
     res.json(token);
   } catch (err) {
     if (err instanceof HandlerError) {
@@ -87,10 +87,9 @@ const authenticate = async (req: Request, res: Response): Promise<void> => {
     if (!authenticate) {
       throw new HandlerError(401, `Wrong id or password`);
     }
-    const token = await jwt.sign(
-      { user: authenticate },
-      process.env.TOKEN_SECRET || ''
-    );
+    const token = jwt.sign({ user: { id: authenticate.id } }, TOKEN_SECRET, {
+      expiresIn: '2h'
+    });
     res.json(token);
   } catch (err) {
     if (err instanceof HandlerError) {
