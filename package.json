@@ -17,8 +17,8 @@
     "migrate:down": "db-migrate --env dev down",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "lint": "eslint src --ext .ts",
-    "test": "npm run test:delete:db ; db-migrate db:create test_db_test ; db-migrate --env test up ; npm run build ; ENV=test jasmine-ts ; db-migrate db:drop test_db_test",
-    "test:delete:db": "db-migrate db:drop test_db_test"
+    "test": "npm run test:delete:db ; db-migrate db:create auth_test ; db-migrate --env test up ; npm run build ; ENV=test jasmine-ts ; db-migrate db:drop auth_test",
+    "test:delete:db": "db-migrate db:drop auth_test"
   },
   "author": "Al Diaz",
   "license": "ISC",

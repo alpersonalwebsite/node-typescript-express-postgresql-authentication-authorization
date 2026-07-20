@@ -1,94 +1,71 @@
-# Node, TS, Express, PostgreSQL, Authentication and Authorization with jsonwebtoken
+# Node, TS, Express, PostgreSQL — Authentication & Authorization with JWT
 
-## Overview
-
-This is an easy, basic and raw example of **HOW to** implement an API with Node, TS, Express and PostgreSQL to **authenticate and authorize with jsonwebtoken**.
+A small, raw example of how to authenticate and authorize an Express + PostgreSQL
+API using `jsonwebtoken`. Meant for learning: clone, run, read.
 
 ## Requirements
 
 * Node 12+
-* NPM
 * PostgreSQL
-* db-migrate package as a global dependency
+* `db-migrate` installed globally
 
-Note: Other libraries will be installed as part of the project with `npm install`
+## Setup
 
-## Prerequisites
+1. Install dependencies:
 
-### Create .env file
-Create at the root level of the project a `.env` file following the structure of `.env-sample`
+   ```shell
+   npm install
+   ```
 
-### Update database.json
-Update the file `database.json` with the proper information.
+2. Create a `.env` from `.env-sample`. Use the **same database names** in `.env`
+   (`POSTGRES_DB` / `POSTGRES_TEST_DB`) and in `database.json` — the app reads
+   `.env`, while migrations read `database.json`.
 
-## Install dependencies
+3. Create the databases and run migrations:
 
-```shell
-npm install
-```
+   ```shell
+   createdb auth_dev
+   createdb auth_test
+   npm run migrate:up
+   ```
 
-## DB
-
-### Create databases 
-
-```shell
-createdb test_db
-createdb test_db_test
-```
-
-### Run migrations
+## Run
 
 ```shell
-npm run migrate:up
-```
-
-## Running the server
-
-### Development
-
-```shell
+# development (watch + rebuild)
 npm run dev
-```
 
-### Production
-
-```shell
+# production
 npm run build
-
 npm start
 ```
 
-## Run unit tests
+## Test & lint
 
 ```shell
 npm test
-```
-
-## Linting
-
-```shell
 npm run lint
 ```
 
-## A note about ERROR handling
+## Example requests
 
-If the error occurs at the `controller layer` (or the logic inside the model), I throw the error passing the error object to the express handler function.
+```shell
+# create a user (returns a JWT)
+curl -X POST localhost:3000/users \
+  -H 'Content-Type: application/json' \
+  -d '{"firstname":"Ada","lastname":"Lovelace","password":"secret"}'
 
-node-typescript-express-postgresql-authentication-authorization/src/models/user.ts
-```ts
-throw new Error(`Cannot get users, ${err}`);
+# call a protected route with the token
+curl localhost:3000/users -H "Authorization: Bearer <token>"
 ```
 
-If the error occurs at the `handler function`...
+## Error handling
 
-1. If the error happens due to throwing an error in the controller (or model logic) I return:
-`res.status(500).json({ message: 'Something went wrong!' });`
-Why I decided to not pass the error to the client? For security concerns and because the client should just care about its interaction with the API, not with the underlying servers (for example, the database).
-
-2. For other errors, aka, errors directly related to the express handler, like `bad request`, `not found` we respond with the proper statusCode and message.
-
----
+Models throw on failure; handlers translate that into a response. Expected
+client errors (bad request, not found, unauthorized) return their status and a
+message. Unexpected errors return a generic `500` so internal details (e.g. the
+database) never leak to the client.
 
 ## Kudos
 
-* Extended version of Udacity's JSFSN User Project
+* Extended version of Udacity's JSFSN User project.
