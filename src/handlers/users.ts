@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
 import { UserWithCredentials, UserStore } from '../models/user';
 import { verifyAuthToken } from '../middlewares/verifyAuthToken';
@@ -100,11 +101,18 @@ const authenticate = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Throttle the credential-checking endpoints to slow down brute-force attempts.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { message: 'Too many attempts, please try again later.' }
+});
+
 const userRoutes = (app: express.Application): void => {
   app.get('/users', verifyAuthToken, index);
   app.get('/users/:id', verifyAuthToken, show);
-  app.post('/users', create);
-  app.post('/users/authenticate', authenticate);
+  app.post('/users', authLimiter, create);
+  app.post('/users/authenticate', authLimiter, authenticate);
 };
 
 export default userRoutes;

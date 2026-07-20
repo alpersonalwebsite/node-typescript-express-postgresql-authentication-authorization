@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import userRoutes from './handlers/users';
 import productRoutes from './handlers/products';
 import orderRoutes from './handlers/orders';
@@ -7,6 +8,7 @@ const app: express.Application = express();
 const PORT = process.env.PORT || 3000;
 export const address = `0.0.0.0:${PORT}`;
 
+app.use(helmet());
 app.use(express.json());
 
 userRoutes(app);
