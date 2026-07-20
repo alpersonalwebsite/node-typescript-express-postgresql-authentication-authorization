@@ -52,10 +52,11 @@ describe('Testing /users endpoints', () => {
       checkIfObjHasAllTheProperties(response.body, [
         'id',
         'firstname',
-        'lastname',
-        'password_digest'
+        'lastname'
       ])
     ).toBeTruthy();
+    // the bcrypt hash must never be exposed, even to the owner
+    expect(response.body.password_digest).toBeUndefined();
   });
 
   it('can get a user (MIN version when user is different than requester) > GET /users/:id', async () => {
