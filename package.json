@@ -9,7 +9,7 @@
     "postgresql authentication authorization"
   ],
   "scripts": {
-    "start": "node src/server.ts",
+    "start": "node dist/server.js",
     "build": "tsc",
     "dev": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess 'node ./dist/server.js'",
     "migrate:up": "db-migrate --env dev up",
