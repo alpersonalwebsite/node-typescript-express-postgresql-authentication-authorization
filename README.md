@@ -59,6 +59,10 @@ curl -X POST localhost:3000/users \
 curl localhost:3000/users -H "Authorization: Bearer <token>"
 ```
 
+Note: `POST /users` and `POST /users/authenticate` are rate-limited (10
+requests per 15 minutes), so hammering them while experimenting can return a
+`429`.
+
 ## Error handling
 
 Models throw on failure; handlers translate that into a response. Expected
