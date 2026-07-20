@@ -44,15 +44,14 @@ describe('User Model', () => {
     ]);
   });
 
-  it('returns the proper user', async () => {
+  it('returns the proper user without the password digest', async () => {
     const result = await store.show('4');
-    const generated_password_digest = result.password_digest;
     expect(result).toEqual({
       id: 4,
       firstname: 'Peter',
-      lastname: 'Parker',
-      password_digest: generated_password_digest
+      lastname: 'Parker'
     });
+    expect(result.password_digest).toBeUndefined();
   });
 
   it('auhenticates with the proper data', async () => {

@@ -1,9 +1,11 @@
 import express, { Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
 import { UserWithCredentials, UserStore } from '../models/user';
 import { verifyAuthToken } from '../middlewares/verifyAuthToken';
 import { HandlerError } from './helpers/handleError';
 import { isTheUser } from '../utils/user';
+import { TOKEN_SECRET } from '../utils/env';
 
 // interface UserToken extends jwt.JwtPayload {
 //   user: User;
@@ -11,12 +13,12 @@ import { isTheUser } from '../utils/user';
 
 const store = new UserStore();
 
-const index = async (req: Request, res: Response): Promise<string | void> => {
+const index = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await store.index();
     res.json(users);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch {
+    res.status(500).json({ message: 'Something went wrong!' });
   }
 };
 
@@ -62,10 +64,9 @@ const create = async (req: Request, res: Response): Promise<void> => {
       throw new HandlerError(400, `password is required`);
     }
     const createUser = await store.create(user);
-    const token = jwt.sign(
-      { user: createUser },
-      process.env.TOKEN_SECRET || ''
-    );
+    const token = jwt.sign({ user: { id: createUser.id } }, TOKEN_SECRET, {
+      expiresIn: '2h'
+    });
     res.json(token);
   } catch (err) {
     if (err instanceof HandlerError) {
@@ -86,10 +87,9 @@ const authenticate = async (req: Request, res: Response): Promise<void> => {
     if (!authenticate) {
       throw new HandlerError(401, `Wrong id or password`);
     }
-    const token = await jwt.sign(
-      { user: authenticate },
-      process.env.TOKEN_SECRET || ''
-    );
+    const token = jwt.sign({ user: { id: authenticate.id } }, TOKEN_SECRET, {
+      expiresIn: '2h'
+    });
     res.json(token);
   } catch (err) {
     if (err instanceof HandlerError) {
@@ -100,11 +100,18 @@ const authenticate = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Throttle the credential-checking endpoints to slow down brute-force attempts.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: 'Too many attempts, please try again later.'
+});
+
 const userRoutes = (app: express.Application): void => {
   app.get('/users', verifyAuthToken, index);
   app.get('/users/:id', verifyAuthToken, show);
-  app.post('/users', create);
-  app.post('/users/authenticate', authenticate);
+  app.post('/users', authLimiter, create);
+  app.post('/users/authenticate', authLimiter, authenticate);
 };
 
 export default userRoutes;
