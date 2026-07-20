@@ -16,49 +16,51 @@ export type ProductsInOrder = {
 
 export class OrderStore {
   async index(): Promise<Order[]> {
+    const conn = await client.connect();
     try {
-      const conn = await client.connect();
       const sql = 'SELECT * FROM orders';
       const result = await conn.query(sql);
-      conn.release();
 
       return result.rows;
     } catch (err) {
-      throw new Error(`Cannot get orders, ${err}`);
+      throw new Error(`Cannot get orders, ${String(err)}`);
+    } finally {
+      conn.release();
     }
   }
 
   async show(id: string): Promise<Order> {
+    const conn = await client.connect();
     try {
-      const conn = await client.connect();
       const sql = 'SELECT * FROM orders WHERE id=($1)';
       const result = await conn.query(sql, [id]);
-      conn.release();
 
       return result.rows[0];
     } catch (err) {
-      throw new Error(`Cannot get that order, ${err}`);
+      throw new Error(`Cannot get that order, ${String(err)}`);
+    } finally {
+      conn.release();
     }
   }
 
   async create(o: Order): Promise<Order> {
+    const conn = await client.connect();
     try {
-      const conn = await client.connect();
       const sql =
         'INSERT INTO orders (status, user_id) VALUES ($1, $2) RETURNING *';
       const result = await conn.query(sql, [o.status, o.user_id]);
-      conn.release();
 
       return result.rows[0];
     } catch (err) {
-      throw new Error(`Cannot create that order, ${err}`);
+      throw new Error(`Cannot create that order, ${String(err)}`);
+    } finally {
+      conn.release();
     }
   }
 
   async addProduct(p: ProductsInOrder): Promise<ProductsInOrder> {
+    const conn = await client.connect();
     try {
-      const conn = await client.connect();
-
       const sqlSelectOrder = 'SELECT * FROM orders WHERE id=($1)';
       const resultSelectOrder = await conn.query(sqlSelectOrder, [p.order_id]);
       const orderStatus = resultSelectOrder.rows[0];
@@ -92,13 +94,12 @@ export class OrderStore {
         p.order_id,
         p.product_id
       ]);
-      const order = result.rows[0];
 
-      conn.release();
-
-      return order;
+      return result.rows[0];
     } catch (err) {
-      throw new Error(`Cannot add a product, ${err}`);
+      throw new Error(`Cannot add a product, ${String(err)}`);
+    } finally {
+      conn.release();
     }
   }
 }
